@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/md-muzzammil-rashid/blog-app-backend-go/cmd/api"
 	"github.com/md-muzzammil-rashid/blog-app-backend-go/config"
 )
 
@@ -34,6 +35,8 @@ func main() {
 		Addr: cfg.Server.Address+":"+cfg.Server.Port,
 	}
 	
+	api.ApiHandler(router)
+
 	done := make(chan os.Signal, 1)
 
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
