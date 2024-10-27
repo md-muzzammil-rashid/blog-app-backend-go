@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/md-muzzammil-rashid/blog-app-backend-go/internal/auth"
 	"github.com/md-muzzammil-rashid/blog-app-backend-go/pkg/utils"
 	// "github.com/md-muzzammil-rashid/blog-app-backend-go/pkg/utils"
 	// "github.com/md-muzzammil-rashid/blog-app-backend-go/pkg/utils"
@@ -16,10 +17,10 @@ func ApiHandler (router *mux.Router) {
         utils.WriteJSON(w, http.StatusOK, "Welcome to the blog API")
 	}).Methods("GET")
 
-	// v1 := router.PathPrefix("/api/v1").Subrouter()
+	v1 := router.PathPrefix("/api/v1").Subrouter()
 
-	// authRoute := v1.PathPrefix("/auth").Subrouter()
+	authRoute := v1.PathPrefix("/auth").Subrouter()
 
-	// auth
+	authRoute.HandleFunc("/register", auth.RegisterUser()).Methods("POST")
 
 }

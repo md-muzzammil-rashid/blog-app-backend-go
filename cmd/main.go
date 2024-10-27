@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/md-muzzammil-rashid/blog-app-backend-go/cmd/api"
 	"github.com/md-muzzammil-rashid/blog-app-backend-go/config"
+	"github.com/md-muzzammil-rashid/blog-app-backend-go/internal/auth"
 )
 
 
@@ -25,6 +26,13 @@ func main() {
 		log.Fatalf("Error in initialization of configuration  \n %v", err)
 	}
 	// database configuration
+
+	_, err = auth.NewAuthRepository(cfg); if err != nil {
+		log.Fatal(err.Error())
+	} 
+
+	slog.Info("Database Connection established!")
+
 	//setup router
 
 	router := mux.NewRouter()

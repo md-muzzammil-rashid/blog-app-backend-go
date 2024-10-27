@@ -1,1 +1,55 @@
 package auth
+
+import (
+	"database/sql"
+
+	"github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
+	"github.com/md-muzzammil-rashid/blog-app-backend-go/config"
+)
+
+type AuthRepository interface {
+	RegisterUser(user UserModel) error
+	// LoginUser(email, password string) (*LoginUserResponseDTO, error)
+	// GetUserByID(id string) (*UserModel, error)
+	// UpdateUser(user UserModel) error
+	// DeleteUser() error
+
+
+}
+type MySQL struct {
+	Db *sql.DB
+}
+
+func NewAuthRepository(cfg *config.Config) (*sql.DB, error) {
+	sqlCfg := mysql.Config{User: cfg.DBUsername, Passwd: cfg.DBPassword, DBName: cfg.DBName}
+	db, err := sql.Open("mysql", sqlCfg.FormatDSN()); if  err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
+		user_id VARCHAR(64) PRIMARY KEY,
+		username VARCHAR(16) NOT NULL,
+        email VARCHAR(64) UNIQUE NOT NULL,
+        password VARCHAR(64) NOT NULL,
+        display_name VARCHAR(128) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	)`); if err != nil {
+		return nil, err
+	}
+	
+    return db, nil
+}
+
+func (m *MySQL) RegisterUser(userData RegisterUserDTO) error {
+	userId := uuid.NewString()
+	stmt,err := m.Db.Prepare("INSERT INTO users (userid, username, email, password, display_name) VALUES (?, ?, ?, ?, ?)"); if err != nil {
+		return err
+	}
+	_ , err =stmt.Exec(userId, userData.Username, userData.Email, userData.Password, userData.DisplayName); if err != nil {
+		return err
+	}
+
+	return nil
+
+}
