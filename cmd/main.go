@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/md-muzzammil-rashid/blog-app-backend-go/cmd/api"
 	"github.com/md-muzzammil-rashid/blog-app-backend-go/config"
-	"github.com/md-muzzammil-rashid/blog-app-backend-go/internal/auth"
+	"github.com/md-muzzammil-rashid/blog-app-backend-go/database"
 )
 
 
@@ -27,9 +27,10 @@ func main() {
 	}
 	// database configuration
 
-	_, err = auth.NewAuthRepository(cfg); if err != nil {
+	db, err := database.NewRepository(cfg); if err != nil {
 		log.Fatal(err.Error())
 	} 
+	defer db.Close()
 
 	slog.Info("Database Connection established!")
 
@@ -43,7 +44,7 @@ func main() {
 		Addr: cfg.Server.Address+":"+cfg.Server.Port,
 	}
 	
-	api.ApiHandler(router)
+	api.ApiHandler(router, db)
 
 	done := make(chan os.Signal, 1)
 

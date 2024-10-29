@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch main.go",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto", // Automatically detect whether to run in debug or test mode
+            "program": "/Users/mdmuzzammilrashid/Desktop/Go/blog-app-backend-go/cmd/main.go", // Full path to main.go
+            "args": [], // Arguments to pass to your program (if any)
+            "env": {}, // Environment variables (if needed)
+            "cwd": "/Users/mdmuzzammilrashid/Desktop/Go/blog-app-backend-go" // Current working directory
+        }
+    ]
+}
