@@ -19,7 +19,7 @@ func NewRepository(cfg *config.Config) (*sql.DB, error) {
         email VARCHAR(64) UNIQUE NOT NULL,
         password VARCHAR(64) NOT NULL,
         display_name VARCHAR(128) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	)`); if err != nil {
 		return nil, err
 	}

@@ -42,7 +42,7 @@ func WriteError(w http.ResponseWriter, statusCode int, message string) {
 	// 	Message: message,
 	// 	Success: false,
 	// }
-	WriteJSON(w, statusCode, message, nil)
+	WriteJSON(w, statusCode, message, nil, )
 }
 
 // ValidationError implements error interface

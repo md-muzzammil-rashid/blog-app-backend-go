@@ -5,12 +5,11 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Authenticator interface {
 	RegisterUser(user UserModel) error
-	LoginUser(email, password string) (LoginUserResponseDTO, error)
+	GetUserByEmail(email string) (UserModel, error)
 	// GetUserByID(id string) (*UserModel, error)
 	// UpdateUser(user UserModel) error
 	// DeleteUser() error
@@ -26,9 +25,9 @@ func NewAuthRepository(db *sql.DB ) *AuthRepository {
     return &AuthRepository{Db: db}
 }
 
-func (m *AuthRepository) RegisterUser(userData RegisterUserDTO) error {
+func (a *AuthRepository) RegisterUser(userData RegisterUserDTO) error {
 	userId := uuid.NewString()
-	stmt,err := m.Db.Prepare("INSERT INTO users (user_id, username, email, password, display_name) VALUES (?, ?, ?, ?, ?)"); if err != nil {
+	stmt,err := a.Db.Prepare("INSERT INTO users (user_id, username, email, password, display_name) VALUES (?, ?, ?, ?, ?)"); if err != nil {
 		return err
 	}
 	_ , err =stmt.Exec(userId, strings.ToLower(userData.Username), strings.ToLower(userData.Email), userData.Password, userData.DisplayName); if err != nil {
@@ -39,17 +38,36 @@ func (m *AuthRepository) RegisterUser(userData RegisterUserDTO) error {
 
 }
 
-func (m *AuthRepository) LoginUser(email, password string) (LoginUserResponseDTO, error) {
-	query := "SELECT * FROM users where email = ?"
+func (a *AuthRepository) GetUserByEmail(email string) (UserModel, error) {
 	var user UserModel
+	query := "SELECT * FROM users WHERE email = ?"
 
-	err := m.Db.QueryRow(query, strings.ToLower(email)).Scan(&user); if err != nil {
-		return LoginUserResponseDTO{}, err
+	stmt, err := a.Db.Prepare(query)
+	if err != nil {
+		return UserModel{}, err
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); if err != nil {
-		return LoginUserResponseDTO{}, err
-	}
+	defer stmt.Close() // Ensure the statement is closed after use
 
-	return LoginUserResponseDTO{UserId: user.UserId, AccessToken: "this is accesstoken", RefreshToken: "This is refresh token" }, nil
-	
+	row := stmt.QueryRow(email)
+	user, err = ScanRowIntoUser(row)
+	if err != nil {
+		return UserModel{}, err
+	}
+	return user, nil
+}
+
+func ScanRowIntoUser(row *sql.Row) (UserModel, error) {
+	var user UserModel
+	err := row.Scan(
+		&user.UserId,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.DisplayName,
+		&user.CreatedAt, // sql.NullTime should handle NULL values gracefully
+	)
+	if err != nil {
+		return UserModel{}, err
+	}
+	return user, nil
 }

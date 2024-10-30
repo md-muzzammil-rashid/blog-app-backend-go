@@ -24,6 +24,7 @@ func ApiHandler (router *mux.Router, db *sql.DB) {
 
 	authRoute := v1.PathPrefix("/auth").Subrouter()
 
-	authRoute.HandleFunc("/register", auth.RegisterUser(authRepo)).Methods("POST")
+	authRoute.HandleFunc("/register", auth.RegisterUser(authRepo)).Methods(http.MethodPost)
 
+	authRoute.HandleFunc("/login", auth.LoginUser(authRepo)).Methods(http.MethodGet)
 }

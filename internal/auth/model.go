@@ -1,6 +1,8 @@
 package auth
 
-import "time"
+import (
+	"database/sql"
+)
 
 type UserModel struct {
 	UserId string `json:"user_id"`
@@ -8,5 +10,5 @@ type UserModel struct {
 	Email string `json:"email"`
 	DisplayName string `json:"display_name"`
 	Password string `json:"password"`
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt sql.NullTime `json:"created_at"`
 }
