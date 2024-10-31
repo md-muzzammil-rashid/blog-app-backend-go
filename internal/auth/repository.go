@@ -10,7 +10,7 @@ import (
 type Authenticator interface {
 	RegisterUser(user UserModel) error
 	GetUserByEmail(email string) (UserModel, error)
-	// GetUserByID(id string) (*UserModel, error)
+	GetUserByID(id string) (*UserModel, error)
 	// UpdateUser(user UserModel) error
 	// DeleteUser() error
 
@@ -70,4 +70,17 @@ func ScanRowIntoUser(row *sql.Row) (UserModel, error) {
 		return UserModel{}, err
 	}
 	return user, nil
+}
+
+func (a *AuthRepository) GetUserByID(id string) (*UserModel, error) {
+	var user UserModel
+	query := "SELECT * from users where user_id = ?"
+	stmt, err := a.Db.Prepare(query); if err != nil {
+		return &UserModel{}, err
+	}
+	row := stmt.QueryRow(id)
+	user, err = ScanRowIntoUser(row); if err != nil {
+		return &UserModel{}, err
+	}
+	return &user, nil
 }

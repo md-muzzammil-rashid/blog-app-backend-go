@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/md-muzzammil-rashid/blog-app-backend-go/internal/auth"
+	"github.com/md-muzzammil-rashid/blog-app-backend-go/pkg/middleware"
 	"github.com/md-muzzammil-rashid/blog-app-backend-go/pkg/utils"
 	// "github.com/md-muzzammil-rashid/blog-app-backend-go/pkg/utils"
 	// "github.com/md-muzzammil-rashid/blog-app-backend-go/pkg/utils"
@@ -19,6 +20,9 @@ func ApiHandler (router *mux.Router, db *sql.DB) {
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         utils.WriteJSON(w, http.StatusOK, "API is working", "Welcome to the blog API")
 	}).Methods("GET")
+	router.HandleFunc("/protected", middleware.VerifyJWT(func(w http.ResponseWriter, r *http.Request) {
+        utils.WriteJSON(w, http.StatusOK, "API is working", "Welcome to the Protected API and the user id is : "+ r.Context().Value("user_id").(string))
+	}, *authRepo)).Methods("GET")
 
 	v1 := router.PathPrefix("/api/v1").Subrouter()
 

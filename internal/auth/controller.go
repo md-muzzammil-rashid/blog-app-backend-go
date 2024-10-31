@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/md-muzzammil-rashid/blog-app-backend-go/pkg/utils"
 )
@@ -46,8 +47,15 @@ func LoginUser(authRepo *AuthRepository) http.HandlerFunc {
 			utils.WriteError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		http.SetCookie(w, &http.Cookie{Name: "access_token", Value: user.AccessToken})
+		http.SetCookie(w, &http.Cookie{
+			Name: "access_token", 
+			Value: user.AccessToken, 
+			HttpOnly: true, 
+			Secure: false, 
+			Expires: time.Now().Add(time.Hour * 24* 7),
+			SameSite: http.SameSiteLaxMode,
+			Path: "/",
+		})
 		utils.WriteJSON(w, http.StatusOK, "User has been successfully logged in", user)
-
 	}
 }
